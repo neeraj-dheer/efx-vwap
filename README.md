@@ -5,14 +5,12 @@
    - Some parameters like venue
    and instrument to be subscribed to can be configured from within the BootStrapper class. (Corresponding Enums need to
    be updated)
-   - The *SimulatedVenues* class is a simple test class to facilitate end to end running.
+   - The *com.efx.vwap.SimulatedVenues* class is a simple test class to facilitate end to end running.
 
 4. Some comments wrt the classes and intended design written as comments within code.
 5. Logger:
    - Have used in the VWAPSubscriber class only and tried to give an example of how it really should be
-   - All log
-   statements will be predefined as char[] with additional space at the end of the array for any values that need to be
-   logged (ideally only an id for each tick with the tick itself being recorded separately)
+   - All log statements will be predefined as char[] with additional space at the end of the array for any values that need to be logged (ideally only an id for each tick with the tick itself being recorded separately)
    - The actual logger in here will copy the char array to a disruptor slot from where an appender will pick the
    message up for actual writing (separate, non-pinned thread)
 
