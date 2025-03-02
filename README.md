@@ -18,4 +18,5 @@
 
 7. TODO:
    - Introduce disruptors at the appropriate places - starting with a disruptor-based subscription manager.
+   - Update the fixed-point arithmetic to cater for more scenarios and overflow checks(for sanity).
    - Extend logger as mentioned above.
