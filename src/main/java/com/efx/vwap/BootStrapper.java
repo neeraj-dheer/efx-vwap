@@ -11,22 +11,28 @@ public class BootStrapper {
 
     public static void main(String[] a) throws Exception {
 
-        SubscriptionManager<MarketDataEvent> subscriptionManager = new DirectSubscriptionManager<>();
-        VWAPSubscriber vwapSubscriber = new VWAPSubscriber();
+        SimulatedVenues simulatedVenues = null;
+        try {
+            SubscriptionManager<MarketDataEvent> subscriptionManager = new DirectSubscriptionManager<>();
+            VWAPSubscriber vwapSubscriber = new VWAPSubscriber();
 
-        subscriptionManager.subscribe(Venue.CURRENEX, Instrument.GBPUSD, vwapSubscriber);
-        subscriptionManager.subscribe(Venue.CME_EBS, Instrument.GBPUSD, vwapSubscriber);
-        subscriptionManager.subscribe(Venue.CME_EBS, Instrument.EURUSD, vwapSubscriber);
-        SimulatedVenues simulatedVenues = new SimulatedVenues(subscriptionManager);
+            subscriptionManager.subscribe(Venue.CURRENEX, Instrument.GBPUSD, vwapSubscriber);
+            subscriptionManager.subscribe(Venue.CME_EBS, Instrument.GBPUSD, vwapSubscriber);
+            subscriptionManager.subscribe(Venue.CME_EBS, Instrument.EURUSD, vwapSubscriber);
 
-        //We should have initialized everything by now - including any cache warmup
-        // so can run gc now and promote objects here itself and free up young gen
-        //assuming java wants to honour our hint to run gc
-        System.gc();
-        simulatedVenues.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(simulatedVenues::stop));
+            simulatedVenues = new SimulatedVenues(subscriptionManager);
 
-        Thread.sleep(10_000);
+            //We should have initialized everything by now - including any cache warmup
+            // so can run gc now and promote objects here itself and free up young gen
+            //assuming java wants to honour our hint to run gc
+            System.gc();
+            simulatedVenues.start();
+            Runtime.getRuntime().addShutdownHook(new Thread(simulatedVenues::stop));
+        }catch(Exception e){
+            if(simulatedVenues != null) {
+                simulatedVenues.stop();
+            }
+        }
 
     }
 }
