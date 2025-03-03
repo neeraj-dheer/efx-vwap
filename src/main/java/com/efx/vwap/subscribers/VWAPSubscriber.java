@@ -57,6 +57,7 @@ public class VWAPSubscriber implements Subscriber<MarketDataEvent> {
 
         if(marketDataEvent.getInstrument() == null) {
             logger.warn(String.valueOf(LogConstants.NULL_INSTRUMENT));
+            return;
         }
 
         //we have a side, so should not get a negative quantity
@@ -81,6 +82,7 @@ public class VWAPSubscriber implements Subscriber<MarketDataEvent> {
                     Instrument.getInstrumentCharArray(marketDataEvent.getInstrument()), 0, 7);
             //not "resetting" the ccypair from array since we will overwerite it every time.
             logger.warn(String.valueOf(LogConstants.INVALID_INSTRUMENT));
+            return;
         }
 
         VWAPByInstrument.VWAP vwap = null;
