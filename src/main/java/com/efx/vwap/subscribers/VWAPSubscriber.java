@@ -55,9 +55,8 @@ public class VWAPSubscriber implements Subscriber<MarketDataEvent> {
     @Override
     public void onMessage(MarketDataEvent marketDataEvent) {
 
-        if (marketDataEvent.getSide() == null) {
-            logger.warn(String.valueOf(LogConstants.INVALID_SIDE));
-            return;
+        if(marketDataEvent.getInstrument() == null) {
+            logger.warn(String.valueOf(LogConstants.NULL_INSTRUMENT));
         }
 
         //we have a side, so should not get a negative quantity
@@ -73,6 +72,16 @@ public class VWAPSubscriber implements Subscriber<MarketDataEvent> {
         }
 
         VWAPByInstrument fullVwap = vwaps.get(marketDataEvent.getInstrument());
+
+        //instrument exists but we are not configured to process that instrument
+        if(fullVwap == null) {
+
+            // 7 - length of ccypair (Ex:- GBP/USD). can be replaced by length of char array
+            System.arraycopy(LogConstants.INVALID_INSTRUMENT, 18,
+                    Instrument.getInstrumentCharArray(marketDataEvent.getInstrument()), 0, 7);
+            //not "resetting" the ccypair from array since we will overwerite it every time.
+            logger.warn(String.valueOf(LogConstants.INVALID_INSTRUMENT));
+        }
 
         VWAPByInstrument.VWAP vwap = null;
 

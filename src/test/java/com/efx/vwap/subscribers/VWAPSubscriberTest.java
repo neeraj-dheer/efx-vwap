@@ -99,6 +99,41 @@ public class VWAPSubscriberTest {
 
     }
 
+    @Test
+    public void testNegativePrice() {
+        MarketDataEvent mde1 = new MarketDataEvent(-10110000, 1_000_000, Instrument.GBPUSD,
+                Side.BUY, Venue.CURRENEX, System.currentTimeMillis());
+
+        //not expecting any result, so if we get a result, assert should fail
+        VWAPByInstrument result = new VWAPByInstrument(Instrument.GBPUSD);
+        result.getBuy().setCumulativePriceAndQty(77777777777L);
+        result.getBuy().setCumulativeQuantity(7777777);
+        result.getBuy().setVwap(17);
+        VWAPPublisherAsserter asserter = new VWAPPublisherAsserter();
+        asserter.setVwapByInstrument(result);
+        VWAPSubscriber subscriber = new VWAPSubscriber(new VWAPCalculator(), asserter);
+        subscriber.onMessage(mde1);
+
+    }
+
+    @Test
+    public void testNegativeQuantity() {
+        MarketDataEvent mde1 = new MarketDataEvent(10110000, -1_000_000, Instrument.GBPUSD,
+                Side.BUY, Venue.CURRENEX, System.currentTimeMillis());
+
+        //not expecting any result, so if we get a result, assert should fail
+        VWAPByInstrument result = new VWAPByInstrument(Instrument.GBPUSD);
+        result.getBuy().setCumulativePriceAndQty(77777777777L);
+        result.getBuy().setCumulativeQuantity(7777777);
+        result.getBuy().setVwap(17);
+        VWAPPublisherAsserter asserter = new VWAPPublisherAsserter();
+        asserter.setVwapByInstrument(result);
+        VWAPSubscriber subscriber = new VWAPSubscriber(new VWAPCalculator(), asserter);
+        subscriber.onMessage(mde1);
+
+    }
+
+
     private static class VWAPPublisherAsserter implements Subscriber<VWAPByInstrument> {
 
         private VWAPByInstrument vwapByInstrument;
