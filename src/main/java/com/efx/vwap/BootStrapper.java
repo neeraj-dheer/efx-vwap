@@ -9,13 +9,17 @@ import com.efx.vwap.subscribers.VWAPSubscriber;
 
 public class BootStrapper {
 
-    public static void main(String[] a) throws Exception {
+    private SimulatedVenues simulatedVenues = null;
+    private SubscriptionManager<MarketDataEvent> subscriptionManager = null;
+    private VWAPSubscriber vwapSubscriber = null;
 
-        SimulatedVenues simulatedVenues = null;
+    public void start() {
+
         try {
-            SubscriptionManager<MarketDataEvent> subscriptionManager = new DirectSubscriptionManager<>();
-            VWAPSubscriber vwapSubscriber = new VWAPSubscriber();
+            subscriptionManager = new DirectSubscriptionManager<>();
+            vwapSubscriber = new VWAPSubscriber();
 
+            //all of this to be derived from config
             subscriptionManager.subscribe(Venue.CURRENEX, Instrument.GBPUSD, vwapSubscriber);
             subscriptionManager.subscribe(Venue.CME_EBS, Instrument.GBPUSD, vwapSubscriber);
             subscriptionManager.subscribe(Venue.CME_EBS, Instrument.EURUSD, vwapSubscriber);
@@ -27,12 +31,29 @@ public class BootStrapper {
             //assuming java wants to honour our hint to run gc
             System.gc();
             simulatedVenues.start();
-            Runtime.getRuntime().addShutdownHook(new Thread(simulatedVenues::stop));
-        }catch(Exception e){
-            if(simulatedVenues != null) {
-                simulatedVenues.stop();
-            }
+            Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
+        } catch (Exception e) {
+            stop();
         }
 
     }
+        public void stop() {
+        if((subscriptionManager != null) && (vwapSubscriber != null)) {
+            subscriptionManager.unsubscribe(Venue.CURRENEX, Instrument.GBPUSD, vwapSubscriber);
+            subscriptionManager.unsubscribe(Venue.CME_EBS, Instrument.GBPUSD, vwapSubscriber);
+            subscriptionManager.unsubscribe(Venue.CME_EBS, Instrument.EURUSD, vwapSubscriber);
+        }
+
+        if(simulatedVenues != null) {
+            simulatedVenues.stop();
+        }
+
+    }
+
+    public static void main(String[] a) {
+        BootStrapper bootStrapper = new BootStrapper();
+        bootStrapper.start();
+    }
+
+
 }
